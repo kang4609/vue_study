@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function openTextFile(){
+            var input = document.createElement("input");
+                
+            input.type = "file";
+            input.accept = "image/*";
+            input.id = "uploadInput";
+            
+            input.click();
+            input.onchange = function (event) {
+                        processFile(event.target.files[0]);
+            };
+        
+    }
+
+function processFile(file){
+    var reader = new FileReader();
+
+    reader.onload = function () {
+    	var result = reader.result;
+        output.innerText = result
+        document.getElementById('tartgetImg').setAttribute('src',result);
+        
+    };
+    reader.readAsDataURL( file );
+}
+
+
+ processFile('https://cdn.pixabay.com/photo/2022/01/16/23/12/desert-6943430_1280.jpg');
+    </script
+</head>
+<body>
+    <button onclick="openTextFile()">Image File Open</button>
+
+<br><hr><br>
+<div>
+  <h1>Base64 Encode String</h1>
+  <div id='output'></div>
+</div>
+<br><hr><br>
+<div>
+<h1>Select Image</h1>
+<img id="tartgetImg" >
+</div>
+</body>
+</html>

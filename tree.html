@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="//code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- This demo uses an 3rd-party, jQuery UI based context menu -->
+    <link
+      href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+      rel="stylesheet"
+    />
+    <script src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <!-- jquery-contextmenu (https://github.com/mar10/jquery-ui-contextmenu/) -->
+    <script src="//cdn.jsdelivr.net/npm/ui-contextmenu/jquery.ui-contextmenu.min.js"></script>
+
+    <link href="../src/skin-win8/ui.fancytree.css" rel="stylesheet" />
+    <script src="../src/jquery.fancytree.js"></script>
+    <script src="../src/jquery.fancytree.dnd5.js"></script>
+    <script src="../src/jquery.fancytree.edit.js"></script>
+    <script src="../src/jquery.fancytree.gridnav.js"></script>
+    <script src="../src/jquery.fancytree.table.js"></script>
+    <!--
+  <script src="../../build/jquery.fancytree-all.min.js"></script>
+-->
+    <style>
+      .fancytree-node {
+        display: flex !important;
+        align-items: center;
+      }
+      .fancytree-exp-nl .fancytree-expander,
+      .fancytree-exp-n .fancytree-expander {
+        visibility: hidden;
+      }
+      .fancytree-exp-nl + ul,
+      .fancytree-exp-n + ul {
+        display: none !important;
+      }
+      span.fancytree-expander,
+      span.fancytree-icon,
+      span.fancytree-title {
+        line-height: 1em;
+      }
+      span.fancytree-expander {
+        text-align: center;
+      }
+      span.fancytree-icon {
+        margin-left: 10px;
+      }
+      span.fancytree-title {
+        margin-left: 2px;
+        padding: 2px;
+        box-sizing: border-box;
+        border: 1px solid transparent;
+      }
+      .fancytree-focused span.fancytree-title {
+        border: 1px solid #999;
+      }
+      .fancytree-active span.fancytree-title {
+        background-color: #ddd;
+      }
+      ul.fancytree-container ul {
+        padding: 2px 0 0 25px;
+      }
+      ul.fancytree-container li {
+        padding: 2px 0;
+      }
+    </style>
+    <script>
+      function expandChildren(node) {
+        if (node.data.autoExpand && !node.isExpanded()) {
+          node.setExpanded(true);
+        }
+        if (node.children && node.children.length > 0) {
+          try {
+            node.children.forEach(expandChildren);
+          } catch (error) {}
+        }
+      }
+
+      $('#tree').fancytree({
+        aria: true, // Enable WAI-ARIA support.
+        autoActivate: false, // Automatically activate a node when it is focused (using keys).
+        autoCollapse: false, // Automatically collapse all siblings, when a node is expanded.
+        autoScroll: false, // Automatically scroll nodes into visible area.
+        focusOnSelect: true, // Set focus when node is checked by a mouse click
+        keyboard: true, // Support keyboard navigation.
+        tabbable: true, // Whole tree behaves as one single control
+        extensions: ['glyph'],
+        glyph: {
+          map: {
+            doc: 'fa fa-file-o fa-lg',
+            docOpen: 'fa fa-file-o fa-lg',
+            error: 'fa fa-warning',
+            expanderClosed: 'fa fa-chevron-right',
+            expanderLazy: 'fa fa-chevron-right',
+            expanderOpen: 'fa fa-chevron-down',
+            folder: 'fa fa-folder fa-lg',
+            folderOpen: 'fa fa-folder-open fa-lg',
+            loading: 'fa fa-spinner fa-pulse',
+          },
+        },
+        source: [
+          { title: 'File 1 in home folder', key: 'qA100' },
+          { title: 'File 2 in home folder', key: 'qA101' },
+          {
+            title: 'Folder in home folder',
+            key: 'fA100',
+            folder: true,
+            lazy: true,
+          },
+          {
+            title: 'File with some children (auto-expand)',
+            key: 'qA102',
+            lazy: true,
+            autoExpand: true,
+          },
+          { title: 'File with no children', key: 'qA110', lazy: true },
+          {
+            title: 'File with no children (auto-expand)',
+            key: 'qA111',
+            lazy: true,
+            autoExpand: true,
+          },
+        ],
+        init: function (event, data) {
+          expandChildren(data.tree.rootNode);
+        },
+        lazyLoad: function (event, data) {
+          var deferredResult = jQuery.Deferred();
+          var result = [];
+
+          setTimeout(
+            function () {
+              switch (data.node.key) {
+                case 'fA100':
+                  result = [
+                    {
+                      title: 'Folder in folder',
+                      key: 'fA101',
+                      folder: true,
+                      lazy: true,
+                    },
+                    { title: 'File in folder', key: 'qA103', lazy: true },
+                  ];
+                  break;
+
+                case 'qA102':
+                  result = [
+                    {
+                      title: 'Folder in folder (auto-expand)',
+                      key: 'fA101',
+                      folder: true,
+                      lazy: true,
+                      autoExpand: true,
+                    },
+                    {
+                      title: 'File in folder (auto-expand)',
+                      key: 'qA103',
+                      lazy: true,
+                      autoExpand: true,
+                    },
+                  ];
+                  break;
+
+                case 'fA101':
+                  result = [
+                    { title: 'File 1 in sub-folder', key: 'qA104' },
+                    { title: 'File 2 in sub-folder', key: 'qA105' },
+                  ];
+                  break;
+
+                case 'qA103':
+                  result = [
+                    { title: 'File 1 in sub-file', key: 'qA106' },
+                    { title: 'File 2 in sub-file', key: 'qA107' },
+                  ];
+                  break;
+
+                case 'qA110':
+                  result = [];
+                  break;
+
+                case 'qA111':
+                  result = [];
+                  break;
+              }
+              deferredResult.resolve(result);
+              expandChildren(data.tree.rootNode);
+            }.bind(this),
+            1000
+          );
+
+          data.result = deferredResult;
+        },
+      });
+    </script>
+  </head>
+  <body>
+    <div id="tree"></div>
+  </body>
+</html>
